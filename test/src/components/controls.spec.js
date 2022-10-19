@@ -4,42 +4,52 @@ import {
   FullscreenControl,
   GeolocateControl,
   NavigationControl,
-  ScaleControl
+  ScaleControl, MapProvider
 } from 'react-map-gl';
 import * as React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import test from 'tape-promise/tape';
 
 test('Controls', t => {
-  const renderer = ReactTestRenderer.create(<Map />);
+  const renderer = ReactTestRenderer.create(<MapProvider><Map /></MapProvider>);
   renderer.update(
-    <Map>
-      <AttributionControl />
-    </Map>
+    <MapProvider>
+      <Map>
+        <AttributionControl />
+      </Map>
+    </MapProvider>
   );
   t.ok(renderer.root, 'Rendered <AttributionControl />');
   renderer.update(
-    <Map>
-      <FullscreenControl />
-    </Map>
+    <MapProvider>
+      <Map>
+        <FullscreenControl />
+      </Map>
+    </MapProvider>
   );
   t.ok(renderer.root, 'Rendered <FullscreenControl />');
   renderer.update(
-    <Map>
-      <GeolocateControl />
-    </Map>
+    <MapProvider>
+      <Map>
+        <GeolocateControl />
+      </Map>
+    </MapProvider>
   );
   t.ok(renderer.root, 'Rendered <GeolocateControl />');
   renderer.update(
-    <Map>
-      <NavigationControl />
-    </Map>
+    <MapProvider>
+      <Map>
+        <NavigationControl />
+      </Map>
+    </MapProvider>
   );
   t.ok(renderer.root, 'Rendered <NavigationControl />');
   renderer.update(
-    <Map>
-      <ScaleControl />
-    </Map>
+    <MapProvider>
+      <Map>
+        <ScaleControl />
+      </Map>
+    </MapProvider>
   );
   t.ok(renderer.root, 'Rendered <ScaleControl />');
 

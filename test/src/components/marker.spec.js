@@ -1,4 +1,4 @@
-import {Map, Marker} from 'react-map-gl';
+import {Map, MapProvider, Marker} from 'react-map-gl';
 import * as React from 'react';
 import {create, act} from 'react-test-renderer';
 import test from 'tape-promise/tape';
@@ -12,9 +12,11 @@ test('Marker', async t => {
   let map;
   act(() => {
     map = create(
+    <MapProvider>
       <Map ref={mapRef}>
         <Marker longitude={-122} latitude={38} />
       </Map>
+    </MapProvider>
     );
   });
 
@@ -31,9 +33,11 @@ test('Marker', async t => {
 
   act(() => {
     map.update(
+    <MapProvider>
       <Map ref={mapRef}>
         <Marker longitude={-122} latitude={38} offset={[0, 0]} />
       </Map>
+    </MapProvider>
     );
   });
 
@@ -42,20 +46,22 @@ test('Marker', async t => {
   let callbackType = '';
   act(() => {
     map.update(
-      <Map ref={mapRef}>
-        <Marker
-          longitude={-122}
-          latitude={38}
-          offset={[0, 1]}
-          rotation={30}
-          draggable
-          pitchAlignment="viewport"
-          rotationAlignment="viewport"
-          onDragStart={() => (callbackType = 'dragstart')}
-          onDrag={() => (callbackType = 'drag')}
-          onDragEnd={() => (callbackType = 'dragend')}
-        />
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef}>
+          <Marker
+            longitude={-122}
+            latitude={38}
+            offset={[0, 1]}
+            rotation={30}
+            draggable
+            pitchAlignment='viewport'
+            rotationAlignment='viewport'
+            onDragStart={() => (callbackType = 'dragstart')}
+            onDrag={() => (callbackType = 'drag')}
+            onDragEnd={() => (callbackType = 'dragend')}
+          />
+        </Map>
+      </MapProvider>
     );
   });
 
@@ -73,18 +79,20 @@ test('Marker', async t => {
   t.is(callbackType, 'dragend', 'onDragEnd called');
 
   act(() => {
-    map.update(<Map ref={mapRef} />);
+    map.update(<MapProvider><Map ref={mapRef} /></MapProvider>);
   });
 
   t.is(mapRef.current.getMap()._markers.length, 0, 'marker is removed');
 
   act(() => {
     map.update(
-      <Map ref={mapRef}>
-        <Marker longitude={-100} latitude={40}>
-          <div id="marker-content" />
-        </Marker>
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef}>
+          <Marker longitude={-100} latitude={40}>
+            <div id='marker-content' />
+          </Marker>
+        </Map>
+      </MapProvider>
     );
   });
 

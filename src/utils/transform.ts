@@ -39,23 +39,24 @@ export function applyViewStateToTransform(tr: Transform, props: MapboxProps): bo
   const v: Partial<ViewState> = props.viewState || props;
   let changed = false;
 
-  if ('longitude' in v && 'latitude' in v) {
+  if (v.longitude && v.latitude) {
     const center = tr.center;
+
     // @ts-ignore
     tr.center = new center.constructor(v.longitude, v.latitude);
     changed = changed || center !== tr.center;
   }
-  if ('zoom' in v) {
+  if (v.zoom) {
     const zoom = tr.zoom;
     tr.zoom = v.zoom;
     changed = changed || zoom !== tr.zoom;
   }
-  if ('bearing' in v) {
+  if (v.bearing) {
     const bearing = tr.bearing;
     tr.bearing = v.bearing;
     changed = changed || bearing !== tr.bearing;
   }
-  if ('pitch' in v) {
+  if (v.pitch) {
     const pitch = tr.pitch;
     tr.pitch = v.pitch;
     changed = changed || pitch !== tr.pitch;

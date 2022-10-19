@@ -14,6 +14,7 @@ test('useMap', async t => {
     return null;
   }
 
+  // todo fix this test
   act(() => {
     app = create(
       <MapProvider>
@@ -25,6 +26,8 @@ test('useMap', async t => {
   });
 
   await waitForMapLoad(mapRef);
+
+
 
   t.ok(maps.mapA, 'Context has mapA');
   t.ok(maps.mapB, 'Context has mapB');

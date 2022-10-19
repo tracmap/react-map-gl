@@ -1,8 +1,7 @@
 import * as React from 'react';
-import {useState, useCallback, useMemo, useContext} from 'react';
-
+import {PropsWithChildren, useCallback, useContext, useMemo, useState} from 'react';
 import {MapRef} from '../mapbox/create-ref';
-import {MapContext} from './map';
+import {useMapContext} from './map';
 
 type MountedMapsContextValue = {
   maps: {[id: string]: MapRef};
@@ -10,9 +9,21 @@ type MountedMapsContextValue = {
   onMapUnmount: (id: string) => void;
 };
 
-export const MountedMapsContext = React.createContext<MountedMapsContextValue>(null);
 
-export const MapProvider: React.FC<{children?: React.ReactNode}> = props => {
+const MountedMapsContext = React.createContext<MountedMapsContextValue|null>(null);
+
+export function useMountedMapsContext() {
+  const context = useContext(MountedMapsContext);
+
+  if(context === null) {
+    throw Error('useMountedMapsContext must be used within a MountedMapsContext.Provider')
+  }
+  return context
+}
+
+
+
+export const MapProvider: React.FC<PropsWithChildren> = props => {
   const [maps, setMaps] = useState<{[id: string]: MapRef}>({});
 
   const onMapMount = useCallback((map: MapRef, id: string = 'default') => {
@@ -52,9 +63,9 @@ export const MapProvider: React.FC<{children?: React.ReactNode}> = props => {
 };
 
 export function useMap(): {current?: MapRef; [id: string]: MapRef | undefined} {
-  const maps = useContext(MountedMapsContext)?.maps;
-  const currentMap = useContext(MapContext);
-
+  const mountedMaps = useMountedMapsContext();
+  const maps = mountedMaps?.maps;
+  const currentMap = useMapContext();
   const mapsWithCurrent = useMemo(() => {
     return {...maps, current: currentMap?.map};
   }, [maps, currentMap]);

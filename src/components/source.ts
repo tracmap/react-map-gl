@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useContext, useEffect, useMemo, useState, useRef} from 'react';
 import {cloneElement} from 'react';
-import {MapContext} from './map';
+import {useMapContext} from './map';
 import assert from '../utils/assert';
 import {deepEqual} from '../utils/deep-equal';
 
@@ -22,12 +22,12 @@ export type SourceProps = AnySourceData & {
 let sourceCounter = 0;
 
 function createSource(map: MapboxMap, id: string, props: SourceProps) {
-  // @ts-ignore
-  if (map.style && map.style._loaded) {
+
+  if (map.isStyleLoaded()) {
     const options = {...props};
     delete options.id;
     delete options.children;
-    // @ts-ignore
+
     map.addSource(id, options);
     return map.getSource(id);
   }
@@ -55,14 +55,16 @@ function updateSource(source: AnySourceImpl, props: SourceProps, prevProps: Sour
 
   const type = props.type;
 
-  if (type === 'geojson') {
+  if (type === 'geojson' && props?.data) {
+    // @ts-ignore
     (source as GeoJSONSource).setData(props.data);
   } else if (type === 'image') {
     (source as ImageSource).updateImage({url: props.url, coordinates: props.coordinates});
   } else if (
     (type === 'canvas' || type === 'video') &&
     changedKeyCount === 1 &&
-    changedKey === 'coordinates'
+    changedKey === 'coordinates' &&
+    props.coordinates
   ) {
     (source as VideoSource).setCoordinates(props.coordinates);
   } else if (type === 'vector' && 'setUrl' in source) {
@@ -71,10 +73,14 @@ function updateSource(source: AnySourceImpl, props: SourceProps, prevProps: Sour
     // vectorTileSource.setUrl
     switch (changedKey) {
       case 'url':
-        source.setUrl(props.url);
+        if (props.url) {
+          source.setUrl(props.url);
+        }
         break;
       case 'tiles':
-        source.setTiles(props.tiles);
+        if (props.tiles) {
+          source.setTiles(props.tiles);
+        }
         break;
       default:
     }
@@ -86,7 +92,7 @@ function updateSource(source: AnySourceImpl, props: SourceProps, prevProps: Sour
 /* eslint-enable complexity */
 
 function Source(props: SourceProps) {
-  const map: MapboxMap = useContext(MapContext).map.getMap();
+  const map: MapboxMap|undefined = useMapContext()?.map?.getMap();
   const propsRef = useRef(props);
   const [, setStyleLoaded] = useState(0);
 
@@ -119,13 +125,13 @@ function Source(props: SourceProps) {
       };
     }
     return undefined;
-  }, [map]);
+  }, [id, map]);
 
   // @ts-ignore
   let source = map && map.style && map.getSource(id);
   if (source) {
     updateSource(source, props, propsRef.current);
-  } else {
+  } else if(map){
     source = createSource(map, id, props);
   }
   propsRef.current = props;

@@ -6,8 +6,10 @@ import {applyReactStyle} from '../utils/apply-react-style';
 
 import type {PopupEvent, Anchor, PointLike, MapboxPopup} from '../types';
 
-import {MapContext} from './map';
+import {useMapContext} from './map';
 import {deepEqual} from '../utils/deep-equal';
+import {PopupOptions} from 'mapbox-gl';
+
 
 export type PopupProps = {
   /** Longitude of the anchor location */
@@ -65,34 +67,37 @@ export type PopupProps = {
 };
 
 // Adapted from https://github.com/mapbox/mapbox-gl-js/blob/v1.13.0/src/ui/popup.js
-function getClassList(className: string) {
+function getClassList(className: string | undefined) {
   return new Set(className ? className.trim().split(/\s+/) : []);
 }
 
 /* eslint-disable complexity,max-statements */
 function Popup(props: PopupProps) {
-  const {map, mapLib} = useContext(MapContext);
+  const {map, mapLib} = useMapContext();
   const container = useMemo(() => {
     return document.createElement('div');
   }, []);
   const thisRef = useRef({props});
   thisRef.current.props = props;
 
-  const popup: MapboxPopup = useMemo(() => {
+  // https://github.com/mapbox/mapbox-gl-js/blob/main/src/ui/popup.js options is set to default options
+  const popup: MapboxPopup & {options: PopupOptions} = useMemo(() => {
     const options = {...props};
     const pp = new mapLib.Popup(options).setLngLat([props.longitude, props.latitude]);
-    pp.once('open', e => {
-      thisRef.current.props.onOpen?.(e as PopupEvent);
+    pp.once('open', (e: PopupEvent) => {
+      thisRef.current.props.onOpen?.(e);
     });
     return pp;
   }, []);
 
   useEffect(() => {
-    const onClose = e => {
+    const onClose = (e: Object | undefined) => {
       thisRef.current.props.onClose?.(e as PopupEvent);
     };
     popup.on('close', onClose);
-    popup.setDOMContent(container).addTo(map.getMap());
+    if(map) {
+      popup.setDOMContent(container).addTo(map.getMap());
+    }
 
     return () => {
       // https://github.com/visgl/react-map-gl/issues/1825
@@ -104,30 +109,31 @@ function Popup(props: PopupProps) {
         popup.remove();
       }
     };
-  }, []);
+  }, [container, map, popup]);
 
   useEffect(() => {
     applyReactStyle(popup.getElement(), props.style);
-  }, [props.style]);
+  }, [popup, props.style]);
 
   if (popup.isOpen()) {
     if (popup.getLngLat().lng !== props.longitude || popup.getLngLat().lat !== props.latitude) {
       popup.setLngLat([props.longitude, props.latitude]);
     }
-    // @ts-ignore
-    if (props.offset && !deepEqual(popup.options.offset, props.offset)) {
+
+    if (props.offset && !deepEqual(popup?.options?.offset, props.offset)) {
       popup.setOffset(props.offset);
     }
-    // @ts-ignore
-    if (popup.options.anchor !== props.anchor || popup.options.maxWidth !== props.maxWidth) {
-      // @ts-ignore
+
+    if (popup?.options?.anchor !== props.anchor) {
       popup.options.anchor = props.anchor;
+    }
+
+    if (props.maxWidth && popup?.options?.maxWidth !== props.maxWidth) {
       popup.setMaxWidth(props.maxWidth);
     }
-    // @ts-ignore
-    if (popup.options.className !== props.className) {
-      // @ts-ignore
-      const prevClassList = getClassList(popup.options.className);
+
+    if (popup?.options?.className !== props.className) {
+      const prevClassList = getClassList(popup?.options?.className);
       const nextClassList = getClassList(props.className);
 
       for (const c of prevClassList) {
@@ -140,7 +146,7 @@ function Popup(props: PopupProps) {
           popup.addClassName(c);
         }
       }
-      // @ts-ignore
+
       popup.options.className = props.className;
     }
   }
@@ -150,3 +156,4 @@ function Popup(props: PopupProps) {
 
 // @ts-ignore
 export default React.memo(Popup);
+

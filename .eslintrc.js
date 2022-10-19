@@ -4,6 +4,9 @@ const defaultConfig = getESLintConfig({react: '16.8.2'});
 
 // Make any changes to default config here
 const config = deepMerge(defaultConfig, {
+  "plugins": [
+    "react-hooks"
+  ],
   parserOptions: {
     project: ['./tsconfig.json'],
     ecmaVersion: 2020
@@ -29,7 +32,10 @@ const config = deepMerge(defaultConfig, {
     'default-case': ['warn'],
     'no-eq-null': ['warn'],
     eqeqeq: ['warn'],
-    radix: 0
+    radix: 0,
+    "react-hooks/rules-of-hooks": "error", // Checks rules of Hooks
+    "react-hooks/exhaustive-deps": "warn" // Checks effect dependencies
+
     // 'accessor-pairs': ['error', {getWithoutSet: false, setWithoutGet: false}]
   },
 

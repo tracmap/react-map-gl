@@ -1,7 +1,7 @@
-import {useContext, useMemo, useEffect} from 'react';
-import type {IControl, ControlPosition} from '../types';
-import {MapContext} from './map';
+import {useEffect, useMemo} from 'react';
+import type {ControlPosition, IControl} from '../types';
 import type {MapContextValue} from './map';
+import {useMapContext} from './map';
 
 type ControlOptions = {
   position?: ControlPosition;
@@ -10,20 +10,20 @@ type ControlOptions = {
 function useControl<T extends IControl>(
   onCreate: (context: MapContextValue) => T,
   opts?: ControlOptions
-);
+): T;
 
 function useControl<T extends IControl>(
   onCreate: (context: MapContextValue) => T,
   onRemove: (context: MapContextValue) => void,
   opts?: ControlOptions
-);
+): T;
 
 function useControl<T extends IControl>(
   onCreate: (context: MapContextValue) => T,
   onAdd: (context: MapContextValue) => void,
   onRemove: (context: MapContextValue) => void,
   opts?: ControlOptions
-);
+): T;
 
 function useControl<T extends IControl>(
   onCreate: (context: MapContextValue) => T,
@@ -31,7 +31,7 @@ function useControl<T extends IControl>(
   arg2?: ((context: MapContextValue) => void) | ControlOptions,
   arg3?: ControlOptions
 ) {
-  const context = useContext(MapContext);
+  const context = useMapContext();
   const ctrl = useMemo(() => onCreate(context), []);
 
   useEffect(() => {
@@ -39,8 +39,14 @@ function useControl<T extends IControl>(
     const onAdd = typeof arg1 === 'function' && typeof arg2 === 'function' ? arg1 : null;
     const onRemove = typeof arg2 === 'function' ? arg2 : typeof arg1 === 'function' ? arg1 : null;
 
+    if(!context) {
+      return () => {
+
+      }
+    }
+
     const {map} = context;
-    if (!map.hasControl(ctrl)) {
+    if (map && !map.hasControl(ctrl)) {
       map.addControl(ctrl, opts?.position);
       if (onAdd) {
         onAdd(context);
@@ -52,11 +58,11 @@ function useControl<T extends IControl>(
         onRemove(context);
       }
       // Map might have been removed (parent effects are destroyed before child ones)
-      if (map.hasControl(ctrl)) {
+      if (map && map.hasControl(ctrl)) {
         map.removeControl(ctrl);
       }
     };
-  }, []);
+  }, [arg1, arg2, arg3, context, ctrl]);
 
   return ctrl;
 }
