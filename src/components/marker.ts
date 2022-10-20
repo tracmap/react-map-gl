@@ -14,8 +14,9 @@ import type {
   MapboxMarker
 } from '../types';
 
-import {MapContext} from './map';
+import {useMapContext} from './map';
 import {arePointsEqual} from '../utils/deep-equal';
+import {ViewStateChangeEvent} from '../types';
 
 export type MarkerProps = {
   /** Longitude of the anchor location */
@@ -76,7 +77,7 @@ export type MarkerProps = {
 
 const defaultProps: Partial<MarkerProps> = {
   draggable: false,
-  popup: null,
+  popup: undefined,
   rotation: 0,
   rotationAlignment: 'auto',
   pitchAlignment: 'auto'
@@ -84,7 +85,7 @@ const defaultProps: Partial<MarkerProps> = {
 
 /* eslint-disable complexity,max-statements */
 function Marker(props: MarkerProps) {
-  const {map, mapLib} = useContext(MapContext);
+  const {map, mapLib} = useMapContext();
   const thisRef = useRef({props});
   thisRef.current.props = props;
 
@@ -110,27 +111,31 @@ function Marker(props: MarkerProps) {
       });
     });
 
-    mk.on('dragstart', e => {
-      const evt = e as MarkerDragEvent;
+    mk.on('dragstart', (e: ViewStateChangeEvent) => {
+      const evt = e as unknown as MarkerDragEvent;
       evt.lngLat = marker.getLngLat();
       thisRef.current.props.onDragStart?.(evt);
     });
-    mk.on('drag', e => {
-      const evt = e as MarkerDragEvent;
+    mk.on('drag', (e: ViewStateChangeEvent) => {
+      const evt = e as unknown as MarkerDragEvent;
       evt.lngLat = marker.getLngLat();
       thisRef.current.props.onDrag?.(evt);
     });
-    mk.on('dragend', e => {
-      const evt = e as MarkerDragEvent;
-      evt.lngLat = marker.getLngLat();
-      thisRef.current.props.onDragEnd?.(evt);
+    mk.on('dragend', (e: ViewStateChangeEvent) => {
+      if (e) {
+        const evt = e as unknown as MarkerDragEvent;
+        evt.lngLat = marker.getLngLat();
+        thisRef.current.props.onDragEnd?.(evt);
+      }
     });
 
     return mk;
   }, []);
 
   useEffect(() => {
-    marker.addTo(map.getMap());
+    if(map) {
+      marker.addTo(map.getMap());
+    }
 
     return () => {
       marker.remove();
@@ -139,7 +144,7 @@ function Marker(props: MarkerProps) {
 
   useEffect(() => {
     applyReactStyle(marker.getElement(), props.style);
-  }, [props.style]);
+  }, [marker, props.style]);
 
   if (marker.getLngLat().lng !== props.longitude || marker.getLngLat().lat !== props.latitude) {
     marker.setLngLat([props.longitude, props.latitude]);
@@ -147,16 +152,16 @@ function Marker(props: MarkerProps) {
   if (props.offset && !arePointsEqual(marker.getOffset(), props.offset)) {
     marker.setOffset(props.offset);
   }
-  if (marker.isDraggable() !== props.draggable) {
+  if (props.draggable && marker.isDraggable() !== props.draggable) {
     marker.setDraggable(props.draggable);
   }
-  if (marker.getRotation() !== props.rotation) {
+  if (props.rotation && marker.getRotation() !== props.rotation) {
     marker.setRotation(props.rotation);
   }
-  if (marker.getRotationAlignment() !== props.rotationAlignment) {
+  if (props.rotationAlignment && marker.getRotationAlignment() !== props.rotationAlignment) {
     marker.setRotationAlignment(props.rotationAlignment);
   }
-  if (marker.getPitchAlignment() !== props.pitchAlignment) {
+  if (props.pitchAlignment && marker.getPitchAlignment() !== props.pitchAlignment) {
     marker.setPitchAlignment(props.pitchAlignment);
   }
   if (marker.getPopup() !== props.popup) {

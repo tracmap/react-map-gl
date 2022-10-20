@@ -1,9 +1,9 @@
-import {useContext, useEffect, useMemo, useState, useRef} from 'react';
-import {MapContext} from './map';
+import {useEffect, useMemo, useRef, useState} from 'react';
+import {useMapContext} from './map';
 import assert from '../utils/assert';
 import {deepEqual} from '../utils/deep-equal';
 
-import type {MapboxMap, AnyLayer} from '../types';
+import type {AnyLayer, MapboxMap} from '../types';
 
 // Omiting property from a union type, see
 // https://github.com/microsoft/TypeScript/issues/39556#issuecomment-656925230
@@ -31,7 +31,9 @@ function updateLayer(map: MapboxMap, id: string, props: LayerProps, prevProps: L
   if (layout !== prevProps.layout) {
     const prevLayout = prevProps.layout || {};
     for (const key in layout) {
+      // @ts-ignore
       if (!deepEqual(layout[key], prevLayout[key])) {
+        // @ts-ignore
         map.setLayoutProperty(id, key, layout[key]);
       }
     }
@@ -44,7 +46,9 @@ function updateLayer(map: MapboxMap, id: string, props: LayerProps, prevProps: L
   if (paint !== prevProps.paint) {
     const prevPaint = prevProps.paint || {};
     for (const key in paint) {
+      // @ts-ignore
       if (!deepEqual(paint[key], prevPaint[key])) {
+        // @ts-ignore
         map.setPaintProperty(id, key, paint[key]);
       }
     }
@@ -57,14 +61,19 @@ function updateLayer(map: MapboxMap, id: string, props: LayerProps, prevProps: L
   if (!deepEqual(filter, prevProps.filter)) {
     map.setFilter(id, filter);
   }
-  if (minzoom !== prevProps.minzoom || maxzoom !== prevProps.maxzoom) {
+  if (
+    typeof minzoom === 'number' &&
+    typeof maxzoom === 'number' &&
+    (minzoom !== prevProps.minzoom || maxzoom !== prevProps.maxzoom)
+  ) {
     map.setLayerZoomRange(id, minzoom, maxzoom);
   }
 }
 
-function createLayer(map: MapboxMap, id: string, props: LayerProps) {
+function createLayer(map: MapboxMap|undefined, id: string, props: LayerProps) {
+
   // @ts-ignore
-  if (map.style && map.style._loaded && (!('source' in props) || map.getSource(props.source))) {
+  if ( map?.style?._loaded && (!('source' in props) || map.getSource(props.source))) {
     const options: LayerProps = {...props, id};
     delete options.beforeId;
 
@@ -77,8 +86,8 @@ function createLayer(map: MapboxMap, id: string, props: LayerProps) {
 
 let layerCounter = 0;
 
-function Layer(props: LayerProps) {
-  const map: MapboxMap = useContext(MapContext).map.getMap();
+function Layer(props: LayerProps): null {
+  const map: MapboxMap | undefined = useMapContext()?.map?.getMap();
   const propsRef = useRef(props);
   const [, setStyleLoaded] = useState(0);
 

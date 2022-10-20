@@ -35,13 +35,16 @@ function ScaleControl(props: ScaleControlProps): null {
     // @ts-ignore
     ctrl.options.maxWidth = props.maxWidth;
     // This method will trigger an update
-    ctrl.setUnit(props.unit);
+    if(props?.unit) {
+      ctrl.setUnit(props.unit);
+    }
   }
 
   useEffect(() => {
     // @ts-ignore
     applyReactStyle(ctrl._container, props.style);
-  }, [props.style]);
+    // @ts-ignore
+  }, [ctrl._container, props.style]);
 
   return null;
 }

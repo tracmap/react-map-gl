@@ -1,4 +1,4 @@
-import {Map, Source} from 'react-map-gl';
+import {Map, MapProvider, Source} from 'react-map-gl';
 import * as React from 'react';
 import {create, act} from 'react-test-renderer';
 import test from 'tape-promise/tape';
@@ -21,9 +21,11 @@ test('Source/Layer', async t => {
   let map;
   act(() => {
     map = create(
+      <MapProvider>
       <Map ref={mapRef}>
         <Source id="my-data" type="geojson" data={geoJSON} />
       </Map>
+      </MapProvider>
     );
   });
   await sleep(5);
@@ -31,9 +33,11 @@ test('Source/Layer', async t => {
 
   act(() =>
     map.update(
-      <Map ref={mapRef} mapStyle={mapStyle}>
-        <Source id="my-data" type="geojson" data={geoJSON2} />
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef} mapStyle={mapStyle}>
+          <Source id='my-data' type='geojson' data={geoJSON2} />
+        </Map>
+      </MapProvider>
     )
   );
   await sleep(5);
@@ -41,14 +45,16 @@ test('Source/Layer', async t => {
 
   act(() =>
     map.update(
-      <Map ref={mapRef} mapStyle={mapStyle}>
-        <Source id="my-data" type="geojson" data={geoJSON2} />
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef} mapStyle={mapStyle}>
+          <Source id='my-data' type='geojson' data={geoJSON2} />
+        </Map>
+      </MapProvider>
     )
   );
   t.is(mapRef.current.getSource('my-data').getData(), geoJSON2, 'Source is updated');
 
-  act(() => map.update(<Map ref={mapRef} mapStyle={mapStyle} />));
+  act(() => map.update(<MapProvider><Map ref={mapRef} mapStyle={mapStyle} /></MapProvider>));
   await sleep(5);
   t.notOk(mapRef.current.getSource('my-data'), 'Source is removed');
 

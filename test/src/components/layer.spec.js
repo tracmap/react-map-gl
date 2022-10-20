@@ -1,4 +1,4 @@
-import {Map, Source, Layer} from 'react-map-gl';
+import {Map, Source, Layer, MapProvider} from 'react-map-gl';
 import * as React from 'react';
 import {create, act} from 'react-test-renderer';
 import test from 'tape-promise/tape';
@@ -34,11 +34,13 @@ test('Source/Layer', async t => {
   let map;
   act(() => {
     map = create(
-      <Map ref={mapRef}>
-        <Source id="my-data" type="geojson" data={geoJSON}>
-          <Layer id="my-layer" {...pointLayer} />
-        </Source>
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef}>
+          <Source id='my-data' type='geojson' data={geoJSON}>
+            <Layer id='my-layer' {...pointLayer} />
+          </Source>
+        </Map>
+      </MapProvider>
     );
   });
   await sleep(5);
@@ -46,11 +48,13 @@ test('Source/Layer', async t => {
 
   act(() =>
     map.update(
-      <Map ref={mapRef}>
-        <Source id="my-data" type="geojson" data={geoJSON}>
-          <Layer id="my-layer" {...pointLayer2} />
-        </Source>
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef}>
+          <Source id='my-data' type='geojson' data={geoJSON}>
+            <Layer id='my-layer' {...pointLayer2} />
+          </Source>
+        </Map>
+      </MapProvider>
     )
   );
   t.is(mapRef.current.getLayer('my-layer').paint['circle-color'], '#000000', 'Layer is updated');
@@ -58,17 +62,19 @@ test('Source/Layer', async t => {
 
   act(() =>
     map.update(
-      <Map ref={mapRef} mapStyle={mapStyle}>
-        <Source id="my-data" type="geojson" data={geoJSON}>
-          <Layer id="my-layer" {...pointLayer2} />
-        </Source>
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef} mapStyle={mapStyle}>
+          <Source id='my-data' type='geojson' data={geoJSON}>
+            <Layer id='my-layer' {...pointLayer2} />
+          </Source>
+        </Map>
+      </MapProvider>
     )
   );
   await sleep(5);
   t.ok(mapRef.current.getLayer('my-layer'), 'Layer is added after style change');
 
-  act(() => map.update(<Map ref={mapRef} mapStyle={mapStyle} />));
+  act(() => map.update(<MapProvider><Map ref={mapRef} mapStyle={mapStyle} /></MapProvider>));
   await sleep(5);
   t.notOk(mapRef.current.getSource('my-data'), 'Source is removed');
   t.notOk(mapRef.current.getLayer('my-layer'), 'Layer is removed');

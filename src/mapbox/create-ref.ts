@@ -30,10 +30,6 @@ export type MapRef = {
 } & Omit<MapboxMap, typeof skipMethods[number]>;
 
 export default function createRef(mapInstance: Mapbox, mapLib: any): MapRef {
-  if (!mapInstance) {
-    return null;
-  }
-
   const map: MapboxMap = mapInstance.map;
   const result: any = {
     getMap: () => map,
@@ -66,6 +62,7 @@ export default function createRef(mapInstance: Mapbox, mapLib: any): MapRef {
   for (const key of getMethodNames(map)) {
     // @ts-expect-error
     if (!(key in result) && !skipMethods.includes(key)) {
+      // @ts-ignore
       result[key] = map[key].bind(map);
     }
   }
@@ -73,7 +70,7 @@ export default function createRef(mapInstance: Mapbox, mapLib: any): MapRef {
   return result;
 }
 
-function getMethodNames(obj) {
+function getMethodNames(obj:any) {
   const result = new Set<string>();
 
   let proto = obj;

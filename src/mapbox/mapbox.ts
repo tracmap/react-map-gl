@@ -1,34 +1,34 @@
-import {transformToViewState, applyViewStateToTransform, cloneTransform} from '../utils/transform';
-import {normalizeStyle} from '../utils/style-utils';
+import {applyViewStateToTransform, cloneTransform, transformToViewState} from '../utils/transform';
 import {deepEqual} from '../utils/deep-equal';
 
 import type {
-  Transform,
-  ProjectionSpecification,
-  ViewState,
-  ViewStateChangeEvent,
   DragPanOptions,
-  ZoomRotateOptions,
-  TransformRequestFunction,
-  Light,
-  Fog,
-  TerrainSpecification,
-  MapboxStyle,
-  ImmutableLike,
-  LngLatBoundsLike,
+  ErrorEvent,
   FitBoundsOptions,
-  MapMouseEvent,
+  Fog,
+  ImmutableLike,
+  Light,
+  LngLatBoundsLike,
+  MapboxEvent,
+  MapboxGeoJSONFeature,
+  MapboxMap,
+  MapboxStyle,
+  MapBoxZoomEvent,
   MapLayerMouseEvent,
   MapLayerTouchEvent,
-  MapWheelEvent,
-  MapBoxZoomEvent,
-  MapStyleDataEvent,
+  MapMouseEvent,
   MapSourceDataEvent,
-  MapboxEvent,
-  ErrorEvent,
-  MapboxGeoJSONFeature,
-  MapboxMap
+  MapStyleDataEvent,
+  MapWheelEvent,
+  ProjectionSpecification,
+  TerrainSpecification,
+  Transform,
+  TransformRequestFunction,
+  ViewState,
+  ViewStateChangeEvent,
+  ZoomRotateOptions
 } from '../types';
+import {normalizeStyle} from '../utils/style-utils';
 
 export type MapboxProps = Partial<ViewState> & {
   // Init options
@@ -411,12 +411,13 @@ export default class Mapbox {
   // In order to control the map reactively, we shadow the transform
   // with the one below, which reflects the view state resolved from
   // both user-supplied props and the underlying state
+  // @ts-ignore
   private _renderTransform: Transform;
 
   // Internal states
   private _internalUpdate: boolean = false;
   private _inRender: boolean = false;
-  private _hoveredFeatures: MapboxGeoJSONFeature[] = null;
+  private _hoveredFeatures: MapboxGeoJSONFeature[] | null = null;
   private _deferredEvents: {
     move: boolean;
     zoom: boolean;
@@ -539,7 +540,8 @@ export default class Mapbox {
       };
     }
 
-    const map: any = new this._MapClass(mapOptions);
+    // @ts-ignore
+    const map: MapboxMap = new this._MapClass(mapOptions);
     // Props that are not part of constructor options
     if (viewState.padding) {
       map.setPadding(viewState.padding);
@@ -551,14 +553,19 @@ export default class Mapbox {
 
     // Hack
     // Insert code into map's render cycle
+    // @ts-ignore
     const renderMap = map._render;
+    // @ts-ignore
     map._render = (arg: number) => {
       this._inRender = true;
       renderMap.call(map, arg);
       this._inRender = false;
     };
+    // @ts-ignore
     const runRenderTaskQueue = map._renderTaskQueue.run;
+    // @ts-ignore
     map._renderTaskQueue.run = (arg: number) => {
+      // @ts-ignore
       runRenderTaskQueue.call(map._renderTaskQueue, arg);
       this._onBeforeRepaint();
     };
@@ -569,6 +576,7 @@ export default class Mapbox {
 
     // add listeners
     map.on('resize', () => {
+      // @ts-ignore
       this._renderTransform.resize(map.transform.width, map.transform.height);
     });
     map.on('styledata', () => this._updateStyleComponents(this.props, {}));
@@ -711,11 +719,12 @@ export default class Mapbox {
     if (nextProps.cursor !== currProps.cursor) {
       this._map.getCanvas().style.cursor = nextProps.cursor;
     }
-    if (nextProps.mapStyle !== currProps.mapStyle) {
-      const options: any = {
+    if (nextProps.mapStyle && nextProps.mapStyle !== currProps.mapStyle) {
+      // type copied from node_modules/@types/mapbox-gl/index.d.ts
+      const options: {diff?: boolean | undefined; localIdeographFontFamily?: string | undefined} = {
         diff: nextProps.styleDiffing
       };
-      if ('localIdeographFontFamily' in nextProps) {
+      if (nextProps.localIdeographFontFamily) {
         options.localIdeographFontFamily = nextProps.localIdeographFontFamily;
       }
       this._map.setStyle(normalizeStyle(nextProps.mapStyle), options);
@@ -788,7 +797,8 @@ export default class Mapbox {
 
     if (shouldTrackHoveredFeatures) {
       const eventType = e.type;
-      const wasHovering = this._hoveredFeatures?.length > 0;
+      // @ts-ignore
+      const wasHovering = this?._hoveredFeatures?.length > 0;
       let features;
       if (eventType === 'mousemove') {
         try {
@@ -862,6 +872,7 @@ export default class Mapbox {
     }
     if (eventType in cameraEvents) {
       if (typeof event === 'object') {
+        // @ts-ignore
         (event as ViewStateChangeEvent).viewState = transformToViewState(tr);
       }
       if (this._map.isMoving()) {
@@ -912,8 +923,8 @@ export default class Mapbox {
  *   REACT_APP_MAPBOX_ACCESS_TOKEN environment variable
  * @returns access token
  */
-function getAccessTokenFromEnv(): string {
-  let accessToken = null;
+function getAccessTokenFromEnv(): string | null {
+  let accessToken: string | null = null;
 
   /* global location, process */
   if (typeof location !== 'undefined') {
@@ -923,13 +934,13 @@ function getAccessTokenFromEnv(): string {
 
   // Note: This depends on bundler plugins (e.g. webpack) importing environment correctly
   try {
-    accessToken = accessToken || process.env.MapboxAccessToken;
+    accessToken = accessToken || (process.env.MapboxAccessToken ?? null);
   } catch {
     // ignore
   }
 
   try {
-    accessToken = accessToken || process.env.REACT_APP_MAPBOX_ACCESS_TOKEN;
+    accessToken = accessToken || (process.env.REACT_APP_MAPBOX_ACCESS_TOKEN ?? null);
   } catch {
     // ignore
   }

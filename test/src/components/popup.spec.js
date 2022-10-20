@@ -1,4 +1,4 @@
-import {Map, Popup} from 'react-map-gl';
+import {Map, MapProvider, Popup} from 'react-map-gl';
 import * as React from 'react';
 import {create, act} from 'react-test-renderer';
 import test from 'tape-promise/tape';
@@ -12,11 +12,13 @@ test('Popup', async t => {
   let map;
   act(() => {
     map = create(
-      <Map ref={mapRef}>
-        <Popup longitude={-122} latitude={38} offset={[0, 10]}>
-          You are here
-        </Popup>
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef}>
+          <Popup longitude={-122} latitude={38} offset={[0, 10]}>
+            You are here
+          </Popup>
+        </Map>
+      </MapProvider>
     );
   });
 
@@ -29,11 +31,13 @@ test('Popup', async t => {
 
   act(() => {
     map.update(
-      <Map ref={mapRef}>
-        <Popup longitude={-122} latitude={38} offset={[0, 10]}>
-          You are here
-        </Popup>
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef}>
+          <Popup longitude={-122} latitude={38} offset={[0, 10]}>
+            You are here
+          </Popup>
+        </Map>
+      </MapProvider>
     );
   });
 
@@ -41,17 +45,19 @@ test('Popup', async t => {
 
   act(() => {
     map.update(
-      <Map ref={mapRef}>
-        <Popup
-          longitude={-122}
-          latitude={38}
-          offset={{top: [0, 0], left: [10, 0]}}
-          anchor="top"
-          maxWidth="100px"
-        >
-          You are here
-        </Popup>
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef}>
+          <Popup
+            longitude={-122}
+            latitude={38}
+            offset={{top: [0, 0], left: [10, 0]}}
+            anchor='top'
+            maxWidth='100px'
+          >
+            You are here
+          </Popup>
+        </Map>
+      </MapProvider>
     );
   });
 
@@ -61,11 +67,13 @@ test('Popup', async t => {
 
   act(() => {
     map.update(
-      <Map ref={mapRef}>
-        <Popup longitude={-122} latitude={38} className="classA">
-          You are here
-        </Popup>
-      </Map>
+      <MapProvider>
+        <Map ref={mapRef}>
+          <Popup longitude={-122} latitude={38} className='classA'>
+            You are here
+          </Popup>
+        </Map>
+      </MapProvider>
     );
   });
 
