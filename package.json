@@ -1,7 +1,7 @@
 {
   "name": "react-map-gl",
   "description": "React components for Mapbox GL JS-compatible libraries",
-  "version": "7.0.0-tm",
+  "version": "7.0.194-tm",
   "keywords": [
     "mapbox",
     "mapbox-gl",
@@ -9,10 +9,7 @@
     "react-mapbox-gl",
     "react mapbox"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/tracmap/react-map-gl.git"
-  },
+  "repository": "git://github.com/tracmap/react-map-gl.git",
   "publishConfig": {
     "registry": "https://npm.pkg.github.com/"
   },
@@ -66,8 +63,5 @@
     "react-test-renderer": "^18.2.0",
     "ts-loader": "^9.4.1",
     "typescript": "^4.8.4"
-  },
-  "pre-commit": [
-    "test-fast"
-  ]
+  }
 }
