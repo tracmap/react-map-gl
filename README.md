@@ -1,3 +1,11 @@
+tips for local development
+
+yarn link your projects react folder
+apply this link to react-map-gl
+
+yarn link react-map-gl
+apply this to your project
+
 <p align="right">
   <a href="https://npmjs.org/package/react-map-gl">
     <img src="https://img.shields.io/npm/v/react-map-gl.svg?style=flat-square" alt="version" />
