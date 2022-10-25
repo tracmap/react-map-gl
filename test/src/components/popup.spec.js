@@ -51,8 +51,8 @@ test('Popup', async t => {
             longitude={-122}
             latitude={38}
             offset={{top: [0, 0], left: [10, 0]}}
-            anchor='top'
-            maxWidth='100px'
+            anchor="top"
+            maxWidth="100px"
           >
             You are here
           </Popup>
@@ -69,7 +69,7 @@ test('Popup', async t => {
     map.update(
       <MapProvider>
         <Map ref={mapRef}>
-          <Popup longitude={-122} latitude={38} className='classA'>
+          <Popup longitude={-122} latitude={38} className="classA">
             You are here
           </Popup>
         </Map>

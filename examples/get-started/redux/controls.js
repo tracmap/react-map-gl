@@ -29,6 +29,7 @@ export default function Controls() {
     } else {
       setError(true);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [inputValue]);
 
   return (

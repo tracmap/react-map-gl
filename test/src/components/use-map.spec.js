@@ -27,8 +27,6 @@ test('useMap', async t => {
 
   await waitForMapLoad(mapRef);
 
-
-
   t.ok(maps.mapA, 'Context has mapA');
   t.ok(maps.mapB, 'Context has mapB');
 

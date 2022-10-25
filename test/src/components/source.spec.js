@@ -22,9 +22,9 @@ test('Source/Layer', async t => {
   act(() => {
     map = create(
       <MapProvider>
-      <Map ref={mapRef}>
-        <Source id="my-data" type="geojson" data={geoJSON} />
-      </Map>
+        <Map ref={mapRef}>
+          <Source id="my-data" type="geojson" data={geoJSON} />
+        </Map>
       </MapProvider>
     );
   });
@@ -35,7 +35,7 @@ test('Source/Layer', async t => {
     map.update(
       <MapProvider>
         <Map ref={mapRef} mapStyle={mapStyle}>
-          <Source id='my-data' type='geojson' data={geoJSON2} />
+          <Source id="my-data" type="geojson" data={geoJSON2} />
         </Map>
       </MapProvider>
     )
@@ -47,14 +47,20 @@ test('Source/Layer', async t => {
     map.update(
       <MapProvider>
         <Map ref={mapRef} mapStyle={mapStyle}>
-          <Source id='my-data' type='geojson' data={geoJSON2} />
+          <Source id="my-data" type="geojson" data={geoJSON2} />
         </Map>
       </MapProvider>
     )
   );
   t.is(mapRef.current.getSource('my-data').getData(), geoJSON2, 'Source is updated');
 
-  act(() => map.update(<MapProvider><Map ref={mapRef} mapStyle={mapStyle} /></MapProvider>));
+  act(() =>
+    map.update(
+      <MapProvider>
+        <Map ref={mapRef} mapStyle={mapStyle} />
+      </MapProvider>
+    )
+  );
   await sleep(5);
   t.notOk(mapRef.current.getSource('my-data'), 'Source is removed');
 

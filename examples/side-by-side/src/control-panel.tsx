@@ -8,6 +8,7 @@ function ControlPanel(props: {mode: Mode; onModeChange: (newMode: Mode) => void}
     evt => {
       props.onModeChange(evt.target.value as Mode);
     },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     [props.onModeChange]
   );
 

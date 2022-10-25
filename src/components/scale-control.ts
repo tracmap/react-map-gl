@@ -35,7 +35,7 @@ function ScaleControl(props: ScaleControlProps): null {
     // @ts-ignore
     ctrl.options.maxWidth = props.maxWidth;
     // This method will trigger an update
-    if(props?.unit) {
+    if (props?.unit) {
       ctrl.setUnit(props.unit);
     }
   }

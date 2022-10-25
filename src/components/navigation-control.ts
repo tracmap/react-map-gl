@@ -35,6 +35,7 @@ function NavigationControl(props: NavigationControlProps): null {
   useEffect(() => {
     // @ts-ignore
     applyReactStyle(ctrl._container, props.style);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.style]);
 
   return null;

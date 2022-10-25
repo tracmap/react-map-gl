@@ -571,6 +571,7 @@ export default class Mapbox {
     };
     map.on('render', () => this._onAfterRepaint());
     // Insert code into map's event pipeline
+    // eslint-disable-next-line @typescript-eslint/unbound-method
     const fireEvent = map.fire;
     map.fire = this._fireEvent.bind(this, fireEvent);
 

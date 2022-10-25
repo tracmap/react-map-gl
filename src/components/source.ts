@@ -1,17 +1,16 @@
 import * as React from 'react';
-import {useContext, useEffect, useMemo, useState, useRef} from 'react';
-import {cloneElement} from 'react';
+import {cloneElement, useEffect, useMemo, useRef, useState} from 'react';
 import {useMapContext} from './map';
 import assert from '../utils/assert';
 import {deepEqual} from '../utils/deep-equal';
 
 import type {
-  MapboxMap,
   AnySourceData,
+  AnySourceImpl,
   GeoJSONSource,
   ImageSource,
-  VideoSource,
-  AnySourceImpl
+  MapboxMap,
+  VideoSource
 } from '../types';
 
 export type SourceProps = AnySourceData & {
@@ -22,8 +21,12 @@ export type SourceProps = AnySourceData & {
 let sourceCounter = 0;
 
 function createSource(map: MapboxMap, id: string, props: SourceProps) {
-
-  if (map.isStyleLoaded()) {
+  /**
+   * This is NOT equivalent to `map.isStyleLoaded()`
+   * because nothing exists in sourceCache
+   */
+  // @ts-ignore
+  if (map.style && map.style._loaded) {
     const options = {...props};
     delete options.id;
     delete options.children;
@@ -92,10 +95,10 @@ function updateSource(source: AnySourceImpl, props: SourceProps, prevProps: Sour
 /* eslint-enable complexity */
 
 function Source(props: SourceProps) {
-  const map: MapboxMap|undefined = useMapContext()?.map?.getMap();
+  const map: MapboxMap | undefined = useMapContext()?.map?.getMap();
   const propsRef = useRef(props);
   const [, setStyleLoaded] = useState(0);
-
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const id = useMemo(() => props.id || `jsx-source-${sourceCounter++}`, []);
 
   useEffect(() => {
@@ -131,7 +134,7 @@ function Source(props: SourceProps) {
   let source = map && map.style && map.getSource(id);
   if (source) {
     updateSource(source, props, propsRef.current);
-  } else if(map){
+  } else if (map) {
     source = createSource(map, id, props);
   }
   propsRef.current = props;

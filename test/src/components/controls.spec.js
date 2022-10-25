@@ -4,14 +4,19 @@ import {
   FullscreenControl,
   GeolocateControl,
   NavigationControl,
-  ScaleControl, MapProvider
+  ScaleControl,
+  MapProvider
 } from 'react-map-gl';
 import * as React from 'react';
 import ReactTestRenderer from 'react-test-renderer';
 import test from 'tape-promise/tape';
 
 test('Controls', t => {
-  const renderer = ReactTestRenderer.create(<MapProvider><Map /></MapProvider>);
+  const renderer = ReactTestRenderer.create(
+    <MapProvider>
+      <Map />
+    </MapProvider>
+  );
   renderer.update(
     <MapProvider>
       <Map>

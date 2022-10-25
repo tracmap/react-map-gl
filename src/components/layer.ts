@@ -70,10 +70,9 @@ function updateLayer(map: MapboxMap, id: string, props: LayerProps, prevProps: L
   }
 }
 
-function createLayer(map: MapboxMap|undefined, id: string, props: LayerProps) {
-
+function createLayer(map: MapboxMap | undefined, id: string, props: LayerProps) {
   // @ts-ignore
-  if ( map?.style?._loaded && (!('source' in props) || map.getSource(props.source))) {
+  if (map?.style?._loaded && (!('source' in props) || map.getSource(props.source))) {
     const options: LayerProps = {...props, id};
     delete options.beforeId;
 
@@ -91,6 +90,7 @@ function Layer(props: LayerProps): null {
   const propsRef = useRef(props);
   const [, setStyleLoaded] = useState(0);
 
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const id = useMemo(() => props.id || `jsx-layer-${layerCounter++}`, []);
 
   useEffect(() => {
@@ -108,6 +108,7 @@ function Layer(props: LayerProps): null {
       };
     }
     return undefined;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [map]);
 
   // @ts-ignore

@@ -1,15 +1,14 @@
 /* global document */
 import * as React from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import {createPortal} from 'react-dom';
-import {useEffect, useMemo, useRef, useContext} from 'react';
 import {applyReactStyle} from '../utils/apply-react-style';
 
-import type {PopupEvent, Anchor, PointLike, MapboxPopup} from '../types';
+import type {Anchor, MapboxPopup, PointLike, PopupEvent} from '../types';
 
 import {useMapContext} from './map';
 import {deepEqual} from '../utils/deep-equal';
 import {PopupOptions} from 'mapbox-gl';
-
 
 export type PopupProps = {
   /** Longitude of the anchor location */
@@ -88,6 +87,7 @@ function Popup(props: PopupProps) {
       thisRef.current.props.onOpen?.(e);
     });
     return pp;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
@@ -95,7 +95,7 @@ function Popup(props: PopupProps) {
       thisRef.current.props.onClose?.(e as PopupEvent);
     };
     popup.on('close', onClose);
-    if(map) {
+    if (map) {
       popup.setDOMContent(container).addTo(map.getMap());
     }
 
@@ -156,4 +156,3 @@ function Popup(props: PopupProps) {
 
 // @ts-ignore
 export default React.memo(Popup);
-

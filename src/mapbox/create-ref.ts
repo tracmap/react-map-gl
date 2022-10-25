@@ -70,7 +70,7 @@ export default function createRef(mapInstance: Mapbox, mapLib: any): MapRef {
   return result;
 }
 
-function getMethodNames(obj:any) {
+function getMethodNames(obj: any) {
   const result = new Set<string>();
 
   let proto = obj;

@@ -112,12 +112,14 @@ const GeolocateControl = forwardRef<GeolocateControlRef, GeolocateControlProps>(
     () => ({
       trigger: () => ctrl.trigger()
     }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     []
   );
 
   useEffect(() => {
     // @ts-ignore
     applyReactStyle(ctrl._container, props.style);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.style]);
 
   return null;

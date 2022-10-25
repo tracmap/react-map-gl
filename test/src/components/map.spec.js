@@ -17,11 +17,11 @@ test('Map', async t => {
   act(() => {
     map = create(
       <MapProvider>
-      <Map
-        ref={mapRef}
-        initialViewState={{longitude: -100, latitude: 40, zoom: 4}}
-        onLoad={onLoad}
-      />
+        <Map
+          ref={mapRef}
+          initialViewState={{longitude: -100, latitude: 40, zoom: 4}}
+          onLoad={onLoad}
+        />
       </MapProvider>
     );
   });
@@ -34,7 +34,11 @@ test('Map', async t => {
   t.is(mapRef.current.getZoom(), 4, 'zoom is set');
 
   act(() => {
-    map.update(<MapProvider><Map ref={mapRef} longitude={-122} latitude={38} zoom={14} onLoad={onLoad} /></MapProvider>);
+    map.update(
+      <MapProvider>
+        <Map ref={mapRef} longitude={-122} latitude={38} zoom={14} onLoad={onLoad} />
+      </MapProvider>
+    );
   });
 
   t.is(mapRef.current.getCenter().lng, -122, 'longitude is updated');
@@ -84,18 +88,18 @@ test('Map#controlled#no-update', async t => {
 
   act(() => {
     create(
-    <MapProvider>
-      <Map
-        ref={mapRef}
-        longitude={-100}
-        latitude={40}
-        zoom={4}
-        onLoad={e => {
-          e.target.easeTo({center: [-122, 38], zoom: 14});
-        }}
-        onRender={onRender}
-      />
-    </MapProvider>
+      <MapProvider>
+        <Map
+          ref={mapRef}
+          longitude={-100}
+          latitude={40}
+          zoom={4}
+          onLoad={e => {
+            e.target.easeTo({center: [-122, 38], zoom: 14});
+          }}
+          onRender={onRender}
+        />
+      </MapProvider>
     );
   });
 });
@@ -120,17 +124,17 @@ test('Map#controlled#mirrow-back', async t => {
     lastLat = viewState.latitude;
 
     return (
-  <MapProvider>
-      <Map
-        ref={mapRef}
-        {...viewState}
-        onLoad={e => {
-          e.target.easeTo({center: [-122, 38], zoom: 14});
-        }}
-        onMove={e => setViewState(e.viewState)}
-        onRender={onRender}
-      />
-  </MapProvider>
+      <MapProvider>
+        <Map
+          ref={mapRef}
+          {...viewState}
+          onLoad={e => {
+            e.target.easeTo({center: [-122, 38], zoom: 14});
+          }}
+          onMove={e => setViewState(e.viewState)}
+          onRender={onRender}
+        />
+      </MapProvider>
     );
   }
 

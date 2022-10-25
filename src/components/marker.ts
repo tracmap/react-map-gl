@@ -1,22 +1,22 @@
 /* global document */
 import * as React from 'react';
+import {useEffect, useMemo, useRef} from 'react';
 import {createPortal} from 'react-dom';
-import {useEffect, useMemo, useRef, useContext} from 'react';
 import {applyReactStyle} from '../utils/apply-react-style';
 
 import type {
-  MarkerDragEvent,
-  MapboxPopup,
-  PointLike,
-  Anchor,
   Alignment,
+  Anchor,
   MapboxEvent,
-  MapboxMarker
+  MapboxMarker,
+  MapboxPopup,
+  MarkerDragEvent,
+  PointLike
 } from '../types';
+import {ViewStateChangeEvent} from '../types';
 
 import {useMapContext} from './map';
 import {arePointsEqual} from '../utils/deep-equal';
-import {ViewStateChangeEvent} from '../types';
 
 export type MarkerProps = {
   /** Longitude of the anchor location */
@@ -130,16 +130,18 @@ function Marker(props: MarkerProps) {
     });
 
     return mk;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {
-    if(map) {
+    if (map) {
       marker.addTo(map.getMap());
     }
 
     return () => {
       marker.remove();
     };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   useEffect(() => {

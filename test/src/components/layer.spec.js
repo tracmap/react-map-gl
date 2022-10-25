@@ -36,8 +36,8 @@ test('Source/Layer', async t => {
     map = create(
       <MapProvider>
         <Map ref={mapRef}>
-          <Source id='my-data' type='geojson' data={geoJSON}>
-            <Layer id='my-layer' {...pointLayer} />
+          <Source id="my-data" type="geojson" data={geoJSON}>
+            <Layer id="my-layer" {...pointLayer} />
           </Source>
         </Map>
       </MapProvider>
@@ -50,8 +50,8 @@ test('Source/Layer', async t => {
     map.update(
       <MapProvider>
         <Map ref={mapRef}>
-          <Source id='my-data' type='geojson' data={geoJSON}>
-            <Layer id='my-layer' {...pointLayer2} />
+          <Source id="my-data" type="geojson" data={geoJSON}>
+            <Layer id="my-layer" {...pointLayer2} />
           </Source>
         </Map>
       </MapProvider>
@@ -64,8 +64,8 @@ test('Source/Layer', async t => {
     map.update(
       <MapProvider>
         <Map ref={mapRef} mapStyle={mapStyle}>
-          <Source id='my-data' type='geojson' data={geoJSON}>
-            <Layer id='my-layer' {...pointLayer2} />
+          <Source id="my-data" type="geojson" data={geoJSON}>
+            <Layer id="my-layer" {...pointLayer2} />
           </Source>
         </Map>
       </MapProvider>
@@ -74,7 +74,13 @@ test('Source/Layer', async t => {
   await sleep(5);
   t.ok(mapRef.current.getLayer('my-layer'), 'Layer is added after style change');
 
-  act(() => map.update(<MapProvider><Map ref={mapRef} mapStyle={mapStyle} /></MapProvider>));
+  act(() =>
+    map.update(
+      <MapProvider>
+        <Map ref={mapRef} mapStyle={mapStyle} />
+      </MapProvider>
+    )
+  );
   await sleep(5);
   t.notOk(mapRef.current.getSource('my-data'), 'Source is removed');
   t.notOk(mapRef.current.getLayer('my-layer'), 'Layer is removed');

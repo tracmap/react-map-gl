@@ -32,6 +32,7 @@ function useControl<T extends IControl>(
   arg3?: ControlOptions
 ) {
   const context = useMapContext();
+  // eslint-disable-next-line react-hooks/exhaustive-deps
   const ctrl = useMemo(() => onCreate(context), []);
 
   useEffect(() => {
@@ -39,10 +40,8 @@ function useControl<T extends IControl>(
     const onAdd = typeof arg1 === 'function' && typeof arg2 === 'function' ? arg1 : null;
     const onRemove = typeof arg2 === 'function' ? arg2 : typeof arg1 === 'function' ? arg1 : null;
 
-    if(!context) {
-      return () => {
-
-      }
+    if (!context) {
+      return () => {};
     }
 
     const {map} = context;

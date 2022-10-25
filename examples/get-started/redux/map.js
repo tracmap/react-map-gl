@@ -15,6 +15,7 @@ export default function MapView() {
 
   const onMove = useCallback(evt => {
     dispatch({type: 'setViewState', payload: evt.viewState});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   return (

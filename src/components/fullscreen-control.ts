@@ -28,6 +28,7 @@ function FullscreenControl(props: FullscreenControlProps): null {
   useEffect(() => {
     // @ts-ignore
     applyReactStyle(ctrl._controlContainer, props.style);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [props.style]);
 
   return null;

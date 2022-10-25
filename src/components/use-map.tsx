@@ -9,19 +9,16 @@ type MountedMapsContextValue = {
   onMapUnmount: (id: string) => void;
 };
 
-
-const MountedMapsContext = React.createContext<MountedMapsContextValue|null>(null);
+const MountedMapsContext = React.createContext<MountedMapsContextValue | null>(null);
 
 export function useMountedMapsContext() {
   const context = useContext(MountedMapsContext);
 
-  if(context === null) {
-    throw Error('useMountedMapsContext must be used within a MountedMapsContext.Provider')
+  if (context === null) {
+    throw Error('useMountedMapsContext must be used within a MountedMapsContext.Provider');
   }
-  return context
+  return context;
 }
-
-
 
 export const MapProvider: React.FC<PropsWithChildren> = props => {
   const [maps, setMaps] = useState<{[id: string]: MapRef}>({});
